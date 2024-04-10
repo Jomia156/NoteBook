@@ -50,3 +50,15 @@ export type TUserData = {
     schedules: Array<any>
 
 }
+
+export type TNoteData = {
+    id?: string,
+    userId?: string,
+    title?: string,
+    content: TNoteContent
+}
+
+export type TNoteContent = {
+    type: "text" | "list",
+    body: string
+}

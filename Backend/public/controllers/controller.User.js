@@ -10,17 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { MongoClient } from "mongodb";
 import { AppConfig } from "../config";
 import { JWTController } from "../components/JWT";
+import { generateID, generateVerifiCode } from "../components/generator";
 import passwordHash from "password-hash";
 import logger from "../components/logger";
 import CustomError from "../components/CustomError";
 import MailController from "../components/MailController";
 const mgClient = new MongoClient(AppConfig.mongoURL);
-const generateID = () => {
-    return "id" + Math.random().toString(16).slice(2);
-};
-const generateVerifiCode = () => {
-    return Math.random().toString(16).slice(2);
-};
 export class UserController {
     static register(regData) {
         return __awaiter(this, void 0, void 0, function* () {

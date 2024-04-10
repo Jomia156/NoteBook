@@ -2,20 +2,13 @@ import { MongoClient, WithId, Document } from "mongodb";
 import { TChangeDataForUser, TJWTPair, TLoginData, TRegistarData, TUserData } from "../types";
 import { AppConfig } from "../config";
 import { JWTController } from "../components/JWT";
+import { generateID, generateVerifiCode } from "../components/generator";
 import passwordHash from "password-hash"
 import logger from "../components/logger";
 import CustomError from "../components/CustomError";
 import MailController from "../components/MailController";
 
 const mgClient = new MongoClient(AppConfig.mongoURL)
-
-const generateID = (): string => {
-    return "id" + Math.random().toString(16).slice(2)
-}
-
-const generateVerifiCode = (): string => {
-    return Math.random().toString(16).slice(2)
-}
 
 export class UserController {
     static async register(regData: TRegistarData): Promise<void> {
