@@ -4,7 +4,6 @@ import logger from "../components/logger";
 import { AppConfig } from "../config";
 import { generateID } from "../components/generator";
 import { TNoteContent, TNoteData } from "../types";
-import { title } from "process";
 
 const mgClient = new MongoClient(AppConfig.mongoURL)
 
@@ -18,7 +17,7 @@ export class NoteController {
             if (!noteData) {
                 let message = "Note dot`t found"
                 logger.debug(message)
-                throw new CustomError("DATA_DOTT_EXISIT", 404, message)
+                throw new CustomError("DATA_DONT_EXISIT", 404, message)
             }
             if (noteData.userId != userId) {
                 let message = "Forbidden"
@@ -106,7 +105,7 @@ export class NoteController {
             if (!note) {
                 let message = "Note dot`t found"
                 logger.debug(message)
-                throw new CustomError("DATA_DOTT_EXISIT", 404, message)
+                throw new CustomError("DATA_DONT_EXISIT", 404, message)
             }
             await db.collection("Note").deleteOne({ _id: note._id })
             return
@@ -134,7 +133,7 @@ export class NoteController {
             if (!noteData) {
                 let message = "Note dot`t found"
                 logger.debug(message)
-                throw new CustomError("DATA_DOTT_EXISIT", 404, message)
+                throw new CustomError("DATA_DONT_EXISIT", 404, message)
             }
             await db.collection("Notes").updateOne({_id:noteData._id}, {content:newContent})
             return

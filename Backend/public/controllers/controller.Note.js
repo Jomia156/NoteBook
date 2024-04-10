@@ -23,7 +23,7 @@ export class NoteController {
                 if (!noteData) {
                     let message = "Note dot`t found";
                     logger.debug(message);
-                    throw new CustomError("DATA_DOTT_EXISIT", 404, message);
+                    throw new CustomError("DATA_DONT_EXISIT", 404, message);
                 }
                 if (noteData.userId != userId) {
                     let message = "Forbidden";
@@ -109,7 +109,7 @@ export class NoteController {
                 if (!note) {
                     let message = "Note dot`t found";
                     logger.debug(message);
-                    throw new CustomError("DATA_DOTT_EXISIT", 404, message);
+                    throw new CustomError("DATA_DONT_EXISIT", 404, message);
                 }
                 yield db.collection("Note").deleteOne({ _id: note._id });
                 return;
@@ -137,7 +137,7 @@ export class NoteController {
                 if (!noteData) {
                     let message = "Note dot`t found";
                     logger.debug(message);
-                    throw new CustomError("DATA_DOTT_EXISIT", 404, message);
+                    throw new CustomError("DATA_DONT_EXISIT", 404, message);
                 }
                 yield db.collection("Notes").updateOne({ _id: noteData._id }, { content: newContent });
                 return;
