@@ -121,7 +121,7 @@ export class NoteController {
         }
         finally {
             mgClient.close()
-        }
+        } 
     }
 
     static async changeContent(noteId: string, newContent: TNoteContent): Promise<void> {

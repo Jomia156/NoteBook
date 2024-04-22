@@ -62,3 +62,15 @@ export type TNoteContent = {
     type: "text" | "list",
     body: string
 }
+
+export type TSchudule = {
+
+}
+
+export type TTask = {
+    taskId?:string
+    title: string | null
+    description: string | null
+}
+
+export type TDateScritg = `${number}${number}.${number}${number}.${number}${number}${number}${number}`

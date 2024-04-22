@@ -7,6 +7,7 @@ import passwordHash from "password-hash"
 import logger from "../components/logger";
 import CustomError from "../components/CustomError";
 import MailController from "../components/MailController";
+import { test } from "../components/Colendar";
 
 const mgClient = new MongoClient(AppConfig.mongoURL)
 
@@ -24,7 +25,7 @@ export class UserController {
                 notes: [],
                 events: [],
                 plans: [],
-                schedules: []
+                schedules: {...test()}
             }
             const verificationSession = {
                 id: generateID(),
