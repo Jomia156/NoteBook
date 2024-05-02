@@ -74,3 +74,8 @@ export type TTask = {
 }
 
 export type TDateScritg = `${number}${number}.${number}${number}.${number}${number}${number}${number}`
+
+export type TFastifyRequerst<T> = {
+    body:T,
+    params:T
+}
