@@ -13,23 +13,15 @@ import { MongoClient } from "mongodb";
 import { AppConfig } from "../config";
 const mgClient = new MongoClient(AppConfig.mongoURL);
 export class ScheduleController {
-    static get(schId, userId) {
+    static get(userId, date) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const dateArr = date.split(".");
+                const year = date[0];
+                const month = date[1];
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
-                const schedule = db.collection("Schedules").findOne({ id: schId });
-                if (!schedule) {
-                    const message = "Element from schedules don`t found";
-                    logger.debug(message);
-                    throw new CustomError("DATA_DONT_EXISIT", 404, message);
-                }
-                if (schedule.userId != userId) {
-                    let message = "Forbidden";
-                    logger.debug(message);
-                    throw new CustomError("FORBIDDEN", 403, message);
-                }
-                return schedule;
+                const schedules = yield db.collection("Users").findOne({ id: userId, schedules:  }, { schedules: 1 });
             }
             catch (err) {
                 if (err instanceof CustomError) {
@@ -44,5 +36,7 @@ export class ScheduleController {
                 mgClient.close();
             }
         });
+    }
+    static create() {
     }
 }

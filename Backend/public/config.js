@@ -9,5 +9,8 @@ export const AppConfig = {
     mail_password: "devPassword156",
     accessToken_lifetime: "10m",
     refreshToken_lifeTime: "15d",
-    verefiSessions_lifetime: 1000 * 60 * 10
+    verefiSessions_lifetime: 1000 * 60 * 10,
+    fileServerHost: "localhost",
+    fileServerPort: 7000,
+    fileServerToken: "2003d00d9b9cb11254dd89c4cebe0a9235db069a7ca027bbfad8ddd0acc2d4eb9c3acca9ff76287b752c669d36e48310c51bda02133cb91cc6c1da45b5023ed7"
 };

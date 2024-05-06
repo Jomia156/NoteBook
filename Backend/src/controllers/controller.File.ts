@@ -24,14 +24,14 @@ export class FileController {
 
     static async uploadFile(file: Buffer, filename:string): Promise<string> {
         try {
-            let data = new FormData()
-            data.append(' ', new Blob([file]), filename);
+            let formData = new FormData()
+            formData.append("firstName", "John");
+            formData.append("filedata", new Blob([file]), filename);
 
             const fileName = await fetch(`http://${AppConfig.fileServerHost}:${AppConfig.fileServerPort}/files`, {
-                body: data,
+                body: formData,
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    // "Content-Type": "multipart/form-data",
+                    "Authorization":AppConfig.fileServerToken
                 },
                 method: "post",
             }).then(data=>data.json()).then(data=>data.data)

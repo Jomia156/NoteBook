@@ -77,5 +77,10 @@ export type TDateScritg = `${number}${number}.${number}${number}.${number}${numb
 
 export type TFastifyRequerst<T> = {
     body:T,
-    params:T
+    params:T,
+    userData?:any,
+    query:T,
+    headers?: {
+        authorization:string
+    }
 }

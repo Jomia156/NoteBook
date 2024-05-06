@@ -11,10 +11,11 @@ import { MongoClient } from "mongodb";
 import { AppConfig } from "../config";
 import { JWTController } from "../components/JWT";
 import { generateID, generateVerifiCode } from "../components/generator";
-import passwordHash from "password-hash";
+import { PasswordHesh } from "../components/PasswordHash";
 import logger from "../components/logger";
 import CustomError from "../components/CustomError";
 import MailController from "../components/MailController";
+import { test } from "../components/Colendar";
 const mgClient = new MongoClient(AppConfig.mongoURL);
 export class UserController {
     static register(regData) {
@@ -25,13 +26,13 @@ export class UserController {
                     login: regData.login,
                     name: regData.name,
                     email: regData.email,
-                    passwordHash: passwordHash.generate(regData.password),
+                    passwordHash: PasswordHesh.generate(regData.password),
                     avatar: null,
                     verified: false,
                     notes: [],
                     events: [],
                     plans: [],
-                    schedules: []
+                    schedules: Object.assign({}, test())
                 };
                 const verificationSession = {
                     id: generateID(),
@@ -79,15 +80,16 @@ export class UserController {
                 const db = mgClient.db("Notebook");
                 const userData = yield db.collection("Users").findOne({ login: loginData.login });
                 if (!userData) {
-                    const message = "User don`t found";
+                    const message = "User don`t found1";
                     logger.debug(message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
-                if (passwordHash.verify(loginData.password, userData.password)) {
+                console.log(loginData.password);
+                if (PasswordHesh.verify(loginData.password, userData.password)) {
                     return yield JWTController.create(userData.id);
                 }
                 else {
-                    const message = "User don`t found";
+                    const message = "User don`t found2";
                     logger.debug(message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
