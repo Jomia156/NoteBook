@@ -13,8 +13,104 @@ export class UserModule {
     static login(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
-                console.log(request.query);
-                return UserController.login(request.query);
+                const jwtPair = yield UserController.login(request.query);
+                response.send({
+                    statusCode: 200,
+                    data: jwtPair
+                }).status(200);
+            }));
+        });
+    }
+    static register(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
+                yield UserController.register(request.body);
+                response.send({
+                    statusCode: 201
+                }).status(201);
+            }));
+        });
+    }
+    static loginForRefresh(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
+                const refreshToken = request.headers.authorization;
+                const jwtPair = yield UserController.loginForRefresh(refreshToken);
+                response.send({
+                    statusCode: 200,
+                    data: jwtPair
+                }).status(200);
+            }));
+        });
+    }
+    static removeUser(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
+                yield UserController.removeUser(request.userData.userId);
+                response.send({
+                    statusCode: 204
+                }).status(204);
+            }));
+        });
+    }
+    static verifiedUser(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
+                yield UserController.verifiedUser(request.userData.userId, request.body.verificationCode);
+                response.send({
+                    statusCode: 201
+                }).status(201);
+            }));
+        });
+    }
+    static verificationReload(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
+                yield UserController.verificationReload(request.userData.userId);
+                response.send({
+                    statusCode: 201
+                }).status(201);
+            }));
+        });
+    }
+    static changeUserData(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
+                yield UserController.changeUserData(request.userData.userId, request.body);
+                response.send({
+                    statusCode: 201
+                }).status(201);
+            }));
+        });
+    }
+    static getUserData(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
+                const userData = yield UserController.getData(request.userData.userId);
+                response.send({
+                    statusCode: 200,
+                    data: userData
+                }).status(200);
+            }));
+        });
+    }
+    static getList(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
+                if (request.params.listType == "events") {
+                    const list = yield UserController.getList(request.userData.userId, "events");
+                    response.send({
+                        statusCode: 200,
+                        data: list
+                    }).status(200);
+                }
+                else if (request.params.listType == "notes") {
+                    const list = yield UserController.getList(request.userData.userId, "notes");
+                    response.send({
+                        statusCode: 200,
+                        data: list
+                    }).status(200);
+                }
             }));
         });
     }

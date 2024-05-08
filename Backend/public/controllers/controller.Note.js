@@ -74,12 +74,12 @@ export class NoteController {
             }
         });
     }
-    static getAllForUser(userId) {
-        return __awaiter(this, void 0, void 0, function* () {
+    static getAll(userId_1) {
+        return __awaiter(this, arguments, void 0, function* (userId, collection = "Users") {
             try {
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
-                const arrayNotesId = (yield db.collection("Users").findOne({ id: userId })).notes;
+                const arrayNotesId = (yield db.collection(collection).findOne({ id: userId })).notes;
                 const arrayNotes = yield db.collection("Notes").find({ $elemMatch: { id: { $in: arrayNotesId } } });
                 if (!arrayNotes) {
                     return [];

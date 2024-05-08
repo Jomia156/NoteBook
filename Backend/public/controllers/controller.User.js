@@ -84,8 +84,7 @@ export class UserController {
                     logger.debug(message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
-                console.log(loginData.password);
-                if (PasswordHesh.verify(loginData.password, userData.password)) {
+                if (PasswordHesh.verify(loginData.password, userData.passwordHash)) {
                     return yield JWTController.create(userData.id);
                 }
                 else {

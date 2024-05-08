@@ -4,21 +4,30 @@ import { MongoClient, WithId, Document, FindCursor } from "mongodb";
 import { AppConfig } from "../config";
 import { generateID } from "../components/generator";
 import { describe } from "node:test";
+import { TDateScritg, TSchuduleData, TTask } from "../types";
+import errorHandlerController from "../errorHendlers/errorHandler.Controller";
+import { Colendar } from "../components/Colendar";
+
 
 const mgClient = new MongoClient(AppConfig.mongoURL)
 
 export class ScheduleController {
-    static async get(userId: string, date: string) {
+    static async get(userId: string, date: string = null, collection:"Users"|"Schedules" = "Users") {
         try {
-            const dateArr = date.split(".")
-            const year = date[0]
-            const month = date[1]
 
             await mgClient.connect()
             const db = mgClient.db("Notebook")
 
-            const schedules = await db.collection("Users").findOne({ id: userId, schedules: }, { schedules: 1 })
-
+            if (date) {
+                const schedules = await db.collection(collection).findOne({ id: userId, schedules: }, { schedules: 1 })
+                const colendar = new Colendar(schedules)
+                colendar.getColendarFromMonth(date)
+                return colendar.getColendar()
+            }
+            else {
+                const schedules = await db.collection(collection).findOne({ id: userId, schedules: }, { schedules: 1 })
+                return schedules
+            }
         }
         catch (err) {
             if (err instanceof CustomError) {
@@ -34,8 +43,77 @@ export class ScheduleController {
         }
     }
 
-    static create() {
+    static async createTask(userId:string, scheduleData:TSchuduleData):Promise<void> {
+        return await errorHandlerController(async ()=>{
+            await mgClient.connect()
+            const db = mgClient.db("Notebook")
 
+            const userData = await db.collection(collection).findOne({id:userId})
+            if (!userData) {
+                const message = "User don`t found"
+                logger.debug("ScheduleController.createTask -> "+message)
+                throw new CustomError("DATA_DONT_FOUND", 404, message)
+            } 
+
+            const userSchedules = userData.schedules
+            const colendar = new Colendar(userSchedules)
+            colendar.appendTask(scheduleData.date, scheduleData.task)
+            const newColendar = colendar.getColendar()
+
+            await db.collection(collection).updateOne({_id:userData._id}, {schedules:newColendar})
+
+
+            mgClient.close()
+            logger.info("ScheduleController.createTask -> OK")
+        })
+    }
+
+    static async changeTask(userId:string, newTask:TTask):Promise<void> {
+        return await errorHandlerController(async ()=>{
+            await mgClient.connect()
+            const db = mgClient.db("Notebook")
+
+            const userData = await db.collection(collection).findOne({id:userId})
+            if (!userData) {
+                const message = "User don`t found"
+                logger.debug("ScheduleController.create -> "+message)
+                throw new CustomError("DATA_DONT_FOUND", 404, message)
+            } 
+
+            const userSchedules = userData.schedules
+            const colendar = new Colendar(userSchedules)
+            colendar.uploadTask(newTask.date, newTask)
+            const newColendar = colendar.getColendar()
+
+            await db.collection(collection).updateOne({_id:userData._id}, {schedules:newColendar})
+
+            mgClient.close()
+            logger.info("ScheduleController.changeTask -> OK")
+        })
+    }
+
+    static async removeTask(userId:string, taskData:TTask):Promise<void> {
+        return await errorHandlerController(async ()=>{
+            await mgClient.connect()
+            const db = mgClient.db("Notebook")
+
+            const userData = await db.collection(collection).findOne({id:userId})
+            if (!userData) {
+                const message = "User don`t found"
+                logger.debug("ScheduleController.create -> "+message)
+                throw new CustomError("DATA_DONT_FOUND", 404, message)
+            } 
+
+            const userSchedules = userData.schedules
+            const colendar = new Colendar(userSchedules)
+            colendar.removeTask(taskData.date, taskData.taskId)
+            const newColendar = colendar.getColendar()
+
+            await db.collection(collection).updateOne({_id:userData._id}, {schedules:newColendar})
+
+            mgClient.close()
+            logger.info("ScheduleController.changeTask -> OK") 
+        })
     }
 }
 

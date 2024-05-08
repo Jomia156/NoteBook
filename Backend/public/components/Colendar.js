@@ -104,6 +104,29 @@ export class Colendar {
     getColendar() {
         return this.colendar;
     }
+    getColendarFromMonth(date) {
+        try {
+            const dateArr = date.split(".");
+            const dateMonth = dateArr[0];
+            const dateYear = dateArr[1];
+            if (!this.colendar[dateYear]) {
+                return {};
+            }
+            if (!this.colendar[dateYear][dateMonth]) {
+                return {};
+            }
+            return this.colendar[dateYear][dateMonth];
+        }
+        catch (err) {
+            if (err instanceof CustomError) {
+                throw err;
+            }
+            else {
+                logger.error(err);
+                throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
+            }
+        }
+    }
 }
 export function test() {
     const a = new Colendar();

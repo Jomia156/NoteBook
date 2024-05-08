@@ -1,4 +1,4 @@
-import {TDateScritg, TTask } from "../types";
+import { TDateScritg, TTask } from "../types";
 import CustomError from "./CustomError";
 import { generateID } from "./generator";
 import logger from "./logger";
@@ -74,7 +74,7 @@ export class Colendar {
         }
     }
 
-    uploadTask(date:TDateScritg, newTask:TTask) {
+    uploadTask(date: TDateScritg, newTask: TTask) {
         try {
             const dateArr = date.split(".")
             const dateDay = dateArr[0]
@@ -105,7 +105,7 @@ export class Colendar {
 
             const neverTask = this.colendar[dateYear][dateMonth][dateDay][newTask.taskId]
 
-            this.colendar[dateYear][dateMonth][dateDay][newTask.taskId] = {...neverTask, ...newTask}
+            this.colendar[dateYear][dateMonth][dateDay][newTask.taskId] = { ...neverTask, ...newTask }
             return
         }
         catch (err) {
@@ -121,12 +121,39 @@ export class Colendar {
     getColendar() {
         return this.colendar
     }
+
+    getColendarFromMonth(date: string) {
+        try {
+            const dateArr = date.split(".")
+            const dateMonth = dateArr[0]
+            const dateYear = dateArr[1]
+
+            if (!this.colendar[dateYear]) {
+                return {}
+            }
+
+            if (!this.colendar[dateYear][dateMonth]) {
+                return {}
+            }
+
+            return this.colendar[dateYear][dateMonth]
+        }
+        catch (err) {
+            if (err instanceof CustomError) {
+                throw err
+            }
+            else {
+                logger.error(err)
+                throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера")
+            }
+        }
+    }
 }
 
-export function test() {   
+export function test() {
     const a = new Colendar()
-    a.appendTask("23.10.2022", {title:"test", description:"Test description"})
-    a.appendTask("24.10.2021", {title:"test", description:"Test description"})
-    a.appendTask("25.10.2024", {title:"test", description:"Test description"})
+    a.appendTask("23.10.2022", { title: "test", description: "Test description" })
+    a.appendTask("24.10.2021", { title: "test", description: "Test description" })
+    a.appendTask("25.10.2024", { title: "test", description: "Test description" })
     return a.getColendar()
 }

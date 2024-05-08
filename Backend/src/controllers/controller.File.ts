@@ -9,6 +9,7 @@ export class FileController {
             const file = await fetch(`http://${AppConfig.fileServerHost}:${AppConfig.fileServerPort}/files/${fileName}`)
             const arraBuffer = await file.arrayBuffer()
             const buffer = new Buffer(arraBuffer)
+            logger.info("FileController.getFile -> OK")
             return buffer
         }
         catch (err) {
@@ -35,6 +36,7 @@ export class FileController {
                 },
                 method: "post",
             }).then(data=>data.json()).then(data=>data.data)
+            logger.info("FileController.uploadFile -> OK")
             return fileName;
         }
         catch (err) {

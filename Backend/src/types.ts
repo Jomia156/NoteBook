@@ -1,3 +1,4 @@
+import { FastifyRequest } from "fastify"
 import { ObjectId } from "mongodb"
 
 export type TLoginData = {
@@ -44,7 +45,7 @@ export type TUserData = {
     passwordHash: string
     avatar: string | null,
     verified: Boolean,
-    notes: Array<string>[],
+    notes: Array<string>,
     events: Array<string>,
     plans: Array<string>,
     schedules: Array<any>
@@ -63,24 +64,67 @@ export type TNoteContent = {
     body: string
 }
 
-export type TSchudule = {
-
+export type TSchuduleData = {
+    date: TDateScritg,
+    task: TTask
 }
 
 export type TTask = {
-    taskId?:string
+    date: TDateScritg,
+    time: TTimeScritg
+    taskId?: string
     title: string | null
     description: string | null
 }
 
-export type TDateScritg = `${number}${number}.${number}${number}.${number}${number}${number}${number}`
+export type TTaskForUpdate = {
+    date: TDateScritg,
+    taskId: string
+    description?: string | null
+    title?: string | null
+    time?: TTimeScritg
+}
 
-export type TFastifyRequerst<T> = {
-    body:T,
-    params:T,
-    userData?:any,
-    query:T,
+export type TDateScritg = `${number}${number}.${number}${number}.${number}${number}${number}${number}`
+export type TTimeScritg = `${number}${number}:${number}${number}`
+
+
+
+export type TFastifyRequerst<T> = FastifyRequest & {
+    body: T,
+    params: T,
+    userData?: any,
+    query: T,
     headers?: {
-        authorization:string
+        authorization: string
     }
+}
+
+export type TListType = {
+    listType: "events" | "notes"
+}
+
+export type TVerificationRequest = {
+    verificationCode: string
+}
+
+export type TEventData = {
+    _id: ObjectId,
+    id: string
+    userId: string
+    title: string
+    description: string
+    date: string,
+    time: string,
+    geoposition: string,
+    avatar: string | null,
+    notes: Array<string>,
+    plans: Array<string>,
+}
+export type TEventDataForCreated = {
+    title: string,
+    decription: string,
+    date: string,
+    time: string,
+    geoposition: string
 }

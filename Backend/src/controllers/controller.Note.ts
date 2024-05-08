@@ -69,12 +69,12 @@ export class NoteController {
         }
     }
 
-    static async getAllForUser(userId: string): Promise<FindCursor<WithId<Document>> | Array<any>> {
+    static async getAll(userId: string, collection:"Users"|"Schedules"="Users"): Promise<FindCursor<WithId<Document>> | Array<any>> {
         try {
             await mgClient.connect()
             const db = mgClient.db("Notebook")
 
-            const arrayNotesId = (await db.collection("Users").findOne({ id: userId })).notes
+            const arrayNotesId = (await db.collection(collection).findOne({ id: userId })).notes
             const arrayNotes = await db.collection("Notes").find({ $elemMatch: { id: { $in: arrayNotesId } } })
             if (!arrayNotes) {
                 return []
