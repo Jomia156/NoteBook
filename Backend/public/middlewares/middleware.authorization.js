@@ -19,6 +19,13 @@ export const authorization = (req, reply, done) => __awaiter(void 0, void 0, voi
                     req.userData = yield UserController.getData(payload.userId);
                     done();
                 }
+                else {
+                    reply.send({
+                        status: 403,
+                        description: "There is no access",
+                        code: "FORIBBEN"
+                    }).status(403);
+                }
             }));
         }
         return;

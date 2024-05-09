@@ -1,10 +1,11 @@
-import Fastify from "fastify"
+import Fastify, { FastifyReply } from "fastify"
 import logger from "./components/logger"
 import { UserController } from "./controllers/controller.User"
 import { AppConfig } from "./config"
 import { FileController } from "./controllers/controller.File"
 import multipart from "@fastify/multipart"
 import routerUser from "./routers/router.User"
+import { TFastifyRequerst } from "./types"
 
 
 const app = Fastify({ logger })
@@ -54,4 +55,10 @@ app.post("/upload", async (req, res) => {
     let buffer = Buffer.from(file);
     const name = await FileController.uploadFile(buffer, part.filename)
     res.send(name || "OK")
+})
+
+app.get('/:filename', async (req, res: FastifyReply) => {
+    const filename = req.params.filename
+    const buffer = await FileController.getFile(filename)
+    res.send(buffer)
 })

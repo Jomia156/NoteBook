@@ -14,6 +14,13 @@ export const authorization = async (req: TFastifyRequerst<any>, reply:FastifyRep
                     req.userData = await UserController.getData(payload.userId)
                     done()
                 }
+                else {
+                    reply.send({
+                        status: 403,
+                        description: "There is no access",
+                        code:"FORIBBEN"
+                    }).status(403)
+                }
             })
         }
         return

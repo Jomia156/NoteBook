@@ -9,14 +9,14 @@ import logger from "../components/logger";
 const mgClient = new MongoClient(AppConfig.mongoURL)
 
 export class EventController {
-    static async create(userId: string, eventData: TEventDataForCreated): Promise<void> {
+    static async create(ownerId: string, eventData: TEventDataForCreated): Promise<void> {
         return await errorHandlerController(async () => {
             await mgClient.connect()
             const db = mgClient.db("Notebook")
 
             const newEvent = {
                 id: generateID(),
-                userId: userId,
+                ownerId: ownerId,
                 title: eventData.title,
                 description: eventData.decription,
                 date: eventData.date,
@@ -31,7 +31,7 @@ export class EventController {
         })
     }
 
-    static async remove(userId: string, eventId: string): Promise<void> {
+    static async remove(ownerId: string, eventId: string): Promise<void> {
         return await errorHandlerController(async () => {
             await mgClient.connect()
             const db = mgClient.db("Notebook")
@@ -41,6 +41,11 @@ export class EventController {
                 logger.debug("EventController.remove -> Event don`t found")
                 throw new CustomError("DATA_DONT_FOUND", 404, "Event don`t found")
             }
+            if (eventData.ownerId != ownerId) {
+                let message = "Forbidden"
+                logger.debug(message)
+                throw new CustomError("FORBIDDEN", 403, message)
+            }
 
             await db.collection("Events").deleteOne({ id: eventId })
 
@@ -49,7 +54,7 @@ export class EventController {
         })
     }
 
-    static async chamgeData(eventId: string, newEventData: TEventData): Promise<void> {
+    static async changeData(ownerId:string, eventId: string, newEventData: TEventData): Promise<void> {
         return await errorHandlerController(async () => {
             await mgClient.connect()
             const db = mgClient.db("Notebook")
@@ -59,7 +64,11 @@ export class EventController {
                 logger.debug("EventController.chamgeData -> Event don`t found")
                 throw new CustomError("DATA_DONT_FOUND", 404, "Event don`t found")
             }
-
+            if (eventData.ownerId != ownerId) {
+                let message = "Forbidden"
+                logger.debug(message)
+                throw new CustomError("FORBIDDEN", 403, message)
+            }
             await db.collection("Events").updateOne({ _id: eventData._id }, newEventData)
 
             mgClient.close()
@@ -67,7 +76,7 @@ export class EventController {
         })
     }
 
-    static async getData(eventId: string): Promise<TEventData> {
+    static async getData(ownerId:string, eventId: string): Promise<TEventData> {
         return await errorHandlerController(async () => {
             await mgClient.connect()
             const db = mgClient.db("Notebook")
@@ -77,7 +86,10 @@ export class EventController {
                 logger.debug("EventController.getData -> Event don`t found")
                 throw new CustomError("DATA_DONT_FOUND", 404, "Event don`t found")
             }
-
+            if (!ownerId == eventData.ownerId) {
+                logger.debug("NoteController.removeById -> FORIBBEN", 403, "There is no access")
+                throw new CustomError("FORIBBEN", 403, "There is no access")
+            }
             mgClient.close()
             logger.info("EventController.getData -> OK")
             return eventData
@@ -85,7 +97,7 @@ export class EventController {
     }
 
 
-    static async getList(eventId:string, listType:TListType) {
+    static async getList(ownerId:string, eventId:string, listType:TListType) {
         return await errorHandlerController(async ()=>{
             await mgClient.connect()
             const db = mgClient.db("Notebook")
@@ -94,6 +106,11 @@ export class EventController {
             if (!eventData) {
                 logger.debug("EventController.getList -> Event don`t found")
                 throw new CustomError("DATA_DONT_FOUND", 404, "Event don`t found")
+            }
+            if (eventData.ownerId != ownerId) {
+                let message = "Forbidden"
+                logger.debug(message)
+                throw new CustomError("FORBIDDEN", 403, message)
             }
 
             mgClient.close()

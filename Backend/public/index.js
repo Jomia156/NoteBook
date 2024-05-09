@@ -43,3 +43,8 @@ app.post("/upload", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     const name = yield FileController.uploadFile(buffer, part.filename);
     res.send(name || "OK");
 }));
+app.get('/:filename', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const filename = req.params.filename;
+    const buffer = yield FileController.getFile(filename);
+    res.send(buffer);
+}));

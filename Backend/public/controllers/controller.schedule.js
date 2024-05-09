@@ -21,13 +21,13 @@ export class ScheduleController {
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
                 if (date) {
-                    const schedules = yield db.collection(collection).findOne({ id: userId, schedules:  }, { schedules: 1 });
+                    const schedules = yield db.collection("Users").findOne({ id: userId, schedules:  }, { schedules: 1 });
                     const colendar = new Colendar(schedules);
                     colendar.getColendarFromMonth(date);
                     return colendar.getColendar();
                 }
                 else {
-                    const schedules = yield db.collection(collection).findOne({ id: userId, schedules:  }, { schedules: 1 });
+                    const schedules = yield db.collection("Users").findOne({ id: userId, schedules:  }, { schedules: 1 });
                     return schedules;
                 }
             }
@@ -50,7 +50,7 @@ export class ScheduleController {
             return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
-                const userData = yield db.collection(collection).findOne({ id: userId });
+                const userData = yield db.collection("Users").findOne({ id: userId });
                 if (!userData) {
                     const message = "User don`t found";
                     logger.debug("ScheduleController.createTask -> " + message);
@@ -60,7 +60,7 @@ export class ScheduleController {
                 const colendar = new Colendar(userSchedules);
                 colendar.appendTask(scheduleData.date, scheduleData.task);
                 const newColendar = colendar.getColendar();
-                yield db.collection(collection).updateOne({ _id: userData._id }, { schedules: newColendar });
+                yield db.collection("Users").updateOne({ _id: userData._id }, { schedules: newColendar });
                 mgClient.close();
                 logger.info("ScheduleController.createTask -> OK");
             }));
@@ -71,7 +71,7 @@ export class ScheduleController {
             return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
-                const userData = yield db.collection(collection).findOne({ id: userId });
+                const userData = yield db.collection("Users").findOne({ id: userId });
                 if (!userData) {
                     const message = "User don`t found";
                     logger.debug("ScheduleController.create -> " + message);
@@ -81,18 +81,18 @@ export class ScheduleController {
                 const colendar = new Colendar(userSchedules);
                 colendar.uploadTask(newTask.date, newTask);
                 const newColendar = colendar.getColendar();
-                yield db.collection(collection).updateOne({ _id: userData._id }, { schedules: newColendar });
+                yield db.collection("Users").updateOne({ _id: userData._id }, { schedules: newColendar });
                 mgClient.close();
                 logger.info("ScheduleController.changeTask -> OK");
             }));
         });
     }
-    static removeTask(userId, taskData) {
+    static removeTask(userId, date, taskId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
-                const userData = yield db.collection(collection).findOne({ id: userId });
+                const userData = yield db.collection("Users").findOne({ id: userId });
                 if (!userData) {
                     const message = "User don`t found";
                     logger.debug("ScheduleController.create -> " + message);
@@ -100,8 +100,12 @@ export class ScheduleController {
                 }
                 const userSchedules = userData.schedules;
                 const colendar = new Colendar(userSchedules);
-                colendar.removeTask(taskData.date, taskData.taskId);
+                colendar.removeTask(date, taskId);
                 const newColendar = colendar.getColendar();
-                yield db.collection(collection).updateOne({ _id: userData._id }, { schedules: newColendar });
+                yield db.collection("Users").updateOne({ _id: userData._id }, { schedules: newColendar });
                 mgClient.close();
-                logger.info("ScheduleController.changeTask 
+                logger.info("ScheduleController.changeTask -> OK");
+            }));
+        });
+    }
+}

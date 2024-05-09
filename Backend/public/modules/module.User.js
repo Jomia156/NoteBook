@@ -46,7 +46,7 @@ export class UserModule {
     static removeUser(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
-                yield UserController.removeUser(request.userData.userId);
+                yield UserController.removeUser(request.userData.id);
                 response.send({
                     statusCode: 204
                 }).status(204);
@@ -56,7 +56,7 @@ export class UserModule {
     static verifiedUser(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
-                yield UserController.verifiedUser(request.userData.userId, request.body.verificationCode);
+                yield UserController.verifiedUser(request.userData.id, request.body.verificationCode);
                 response.send({
                     statusCode: 201
                 }).status(201);
@@ -66,7 +66,7 @@ export class UserModule {
     static verificationReload(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
-                yield UserController.verificationReload(request.userData.userId);
+                yield UserController.verificationReload(request.userData.id);
                 response.send({
                     statusCode: 201
                 }).status(201);
@@ -76,7 +76,7 @@ export class UserModule {
     static changeUserData(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
-                yield UserController.changeUserData(request.userData.userId, request.body);
+                yield UserController.changeUserData(request.userData.id, request.body);
                 response.send({
                     statusCode: 201
                 }).status(201);
@@ -86,7 +86,7 @@ export class UserModule {
     static getUserData(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
             yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
-                const userData = yield UserController.getData(request.userData.userId);
+                const userData = yield UserController.getData(request.userData.id);
                 response.send({
                     statusCode: 200,
                     data: userData
@@ -98,14 +98,14 @@ export class UserModule {
         return __awaiter(this, void 0, void 0, function* () {
             yield errorHandlerModule(response, () => __awaiter(this, void 0, void 0, function* () {
                 if (request.params.listType == "events") {
-                    const list = yield UserController.getList(request.userData.userId, "events");
+                    const list = yield UserController.getList(request.userData.id, "events");
                     response.send({
                         statusCode: 200,
                         data: list
                     }).status(200);
                 }
                 else if (request.params.listType == "notes") {
-                    const list = yield UserController.getList(request.userData.userId, "notes");
+                    const list = yield UserController.getList(request.userData.id, "notes");
                     response.send({
                         statusCode: 200,
                         data: list

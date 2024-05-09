@@ -54,7 +54,7 @@ export type TUserData = {
 
 export type TNoteData = {
     id?: string,
-    userId?: string,
+    ownerId?: string,
     title?: string,
     content: TNoteContent
 }

@@ -38,7 +38,7 @@ export class UserModule {
 
     static async removeUser(request: TFastifyRequerst<undefined>, response: FastifyReply) {
         await errorHandlerModule(response, async () => {
-            await UserController.removeUser(request.userData.userId)
+            await UserController.removeUser(request.userData.id)
             response.send({
                 statusCode: 204
             }).status(204)
@@ -47,7 +47,7 @@ export class UserModule {
 
     static async verifiedUser(request: TFastifyRequerst<TVerificationRequest>, response: FastifyReply) {
         await errorHandlerModule(response, async () => {
-            await UserController.verifiedUser(request.userData.userId, request.body.verificationCode)
+            await UserController.verifiedUser(request.userData.id, request.body.verificationCode)
             response.send({
                 statusCode: 201
             }).status(201)
@@ -56,7 +56,7 @@ export class UserModule {
 
     static async verificationReload(request: TFastifyRequerst<undefined>, response: FastifyReply) {
         await errorHandlerModule(response, async () => {
-            await UserController.verificationReload(request.userData.userId)
+            await UserController.verificationReload(request.userData.id)
             response.send({
                 statusCode: 201
             }).status(201)
@@ -65,7 +65,7 @@ export class UserModule {
 
     static async changeUserData(request: TFastifyRequerst<TChangeDataForUser>, response: FastifyReply) {
         await errorHandlerModule(response, async () => {
-            await UserController.changeUserData(request.userData.userId, request.body)
+            await UserController.changeUserData(request.userData.id, request.body)
             response.send({
                 statusCode: 201
             }).status(201)
@@ -74,7 +74,7 @@ export class UserModule {
 
     static async getUserData(request: TFastifyRequerst<undefined>, response: FastifyReply) {
         await errorHandlerModule(response, async () => {
-            const userData = await UserController.getData(request.userData.userId)
+            const userData = await UserController.getData(request.userData.id)
             response.send({
                 statusCode: 200,
                 data: userData
@@ -85,14 +85,14 @@ export class UserModule {
     static async getList(request: TFastifyRequerst<TListType>, response: FastifyReply) {
         await errorHandlerModule(response, async () => {
             if (request.params.listType == "events") {
-                const list = await UserController.getList(request.userData.userId, "events")
+                const list = await UserController.getList(request.userData.id, "events")
                 response.send({
                     statusCode: 200,
                     data: list
                 }).status(200)
             }
             else if (request.params.listType == "notes") {
-                const list = await UserController.getList(request.userData.userId, "notes")
+                const list = await UserController.getList(request.userData.id, "notes")
                 response.send({
                     statusCode: 200,
                     data: list
