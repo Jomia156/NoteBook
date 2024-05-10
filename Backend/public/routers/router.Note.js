@@ -1,53 +1,102 @@
-import { UserModule } from "../modules/module.User";
+import NoteModule from "../modules/module.Note";
 import { authorization } from "../middlewares/middleware.authorization";
 export default function (app) {
     app.route({
         method: 'GET',
-        url: '/api/user/login',
+        url: '/api/:collection/note/:noteId',
         schema: {
-            querystring: {
+            headers: {
                 type: "object",
-                required: ["login", "password"],
+                required: ["authorization"],
                 properties: {
-                    login: {
-                        type: "string"
-                    },
-                    password: {
+                    authorization: {
                         type: "string"
                     }
                 }
             }
         },
-        handler: UserModule.login
+        preHandler: authorization,
+        handler: NoteModule.get
     });
     app.route({
         method: 'POST',
-        url: '/api/user/register',
+        url: '/api/user/note',
         schema: {
             body: {
                 type: "object",
-                required: ["name", "login", "password", "email"],
+                required: ["title, content"],
                 properties: {
-                    name: {
+                    title: {
                         type: "string"
                     },
-                    login: {
-                        type: "string"
-                    },
-                    password: {
-                        type: "string"
-                    },
-                    email: {
+                    content: {
+                        type: "object",
+                        required: ["title, content"],
+                        properties: {
+                            type: {
+                                type: "string",
+                            },
+                            body: {
+                                type: "string"
+                            }
+                        }
+                    }
+                }
+            },
+            headers: {
+                type: "object",
+                required: ["authorization"],
+                properties: {
+                    authorization: {
                         type: "string"
                     }
                 }
             }
         },
-        handler: UserModule.register
+        preHandler: authorization,
+        handler: NoteModule.create
+    });
+    app.route({
+        method: 'POST',
+        url: '/api/event/:eventId/note',
+        schema: {
+            body: {
+                type: "object",
+                required: ["title, content"],
+                properties: {
+                    title: {
+                        type: "string"
+                    },
+                    content: {
+                        type: "object",
+                        required: ["title, content"],
+                        properties: {
+                            type: {
+                                type: "string",
+                            },
+                            body: {
+                                type: "string"
+                            }
+                        }
+                    }
+                }
+            },
+            headers: {
+                type: "object",
+                required: ["authorization"],
+                properties: {
+                    authorization: {
+                        type: "string"
+                    }
+                }
+            }
+        },
+        preHandler: authorization,
+        handler: NoteModule.create
     });
     app.route({
         method: 'GET',
-        url: '/api/user/loginForReftesh',
+        url: '/api/user/notes',
         schema: {
             headers: {
                 type: "object",
@@ -60,11 +109,28 @@ export default function (app) {
             }
         },
         preHandler: authorization,
-        handler: UserModule.loginForRefresh
+        handler: NoteModule.getAll
+    });
+    app.route({
+        method: 'GET',
+        url: '/api/event/:eventId/notes',
+        schema: {
+            headers: {
+                type: "object",
+                required: ["authorization"],
+                properties: {
+                    authorization: {
+                        type: "string"
+                    }
+                }
+            }
+        },
+        preHandler: authorization,
+        handler: NoteModule.getAll
     });
     app.route({
         method: 'DELETE',
-        url: '/api/user',
+        url: '/api/user/notes/:noteId',
         schema: {
             headers: {
                 type: "object",
@@ -77,37 +143,11 @@ export default function (app) {
             }
         },
         preHandler: authorization,
-        handler: UserModule.removeUser
+        handler: NoteModule.remove
     });
     app.route({
-        method: 'GET',
-        url: '/api/user/verification',
-        schema: {
-            querystring: {
-                type: "object",
-                required: ["verificationCode"],
-                properties: {
-                    verificationCode: {
-                        type: "string"
-                    }
-                }
-            },
-            headers: {
-                type: "object",
-                required: ["authorization"],
-                properties: {
-                    authorization: {
-                        type: "string"
-                    }
-                }
-            }
-        },
-        preHandler: authorization,
-        handler: UserModule.verifiedUser
-    });
-    app.route({
-        method: 'GET',
-        url: '/api/user/verificationReload',
+        method: 'DELETE',
+        url: '/api/event/:eventId/notes/:noteId',
         schema: {
             headers: {
                 type: "object",
@@ -120,71 +160,6 @@ export default function (app) {
             }
         },
         preHandler: authorization,
-        handler: UserModule.verificationReload
-    });
-    app.route({
-        method: 'PUT',
-        url: '/api/user',
-        schema: {
-            headers: {
-                type: "object",
-                required: ["authorization"],
-                properties: {
-                    authorization: {
-                        type: "string"
-                    }
-                }
-            },
-            body: {
-                type: "object",
-                properties: {
-                    name: {
-                        type: "string"
-                    },
-                    avatar: {
-                        type: "string"
-                    },
-                    password: {
-                        type: "string"
-                    }
-                }
-            }
-        },
-        preHandler: authorization,
-        handler: UserModule.changeUserData
-    });
-    app.route({
-        method: 'GET',
-        url: '/api/user',
-        schema: {
-            headers: {
-                type: "object",
-                required: ["authorization"],
-                properties: {
-                    authorization: {
-                        type: "string"
-                    }
-                }
-            },
-        },
-        preHandler: authorization,
-        handler: UserModule.getUserData
-    });
-    app.route({
-        method: 'GET',
-        url: '/api/user/list/:listType',
-        schema: {
-            headers: {
-                type: "object",
-                required: ["authorization"],
-                properties: {
-                    authorization: {
-                        type: "string"
-                    }
-                }
-            },
-        },
-        preHandler: authorization,
-        handler: UserModule.getUserData
+        handler: NoteModule.remove
     });
 }
