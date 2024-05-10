@@ -17,32 +17,24 @@ const mgClient = new MongoClient(AppConfig.mongoURL);
 export class ScheduleController {
     static get(userId_1) {
         return __awaiter(this, arguments, void 0, function* (userId, date = null, collection = "Users") {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
                 if (date) {
                     const schedules = yield db.collection("Users").findOne({ id: userId, schedules:  }, { schedules: 1 });
                     const colendar = new Colendar(schedules);
                     colendar.getColendarFromMonth(date);
+                    mgClient.close();
+                    logger.info("ScheduleController.get -> OK");
                     return colendar.getColendar();
                 }
                 else {
                     const schedules = yield db.collection("Users").findOne({ id: userId, schedules:  }, { schedules: 1 });
+                    mgClient.close();
+                    logger.info("ScheduleController.get -> OK");
                     return schedules;
                 }
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
-                mgClient.close();
-            }
+            }));
         });
     }
     static createTask(userId, scheduleData) {
@@ -53,6 +45,7 @@ export class ScheduleController {
                 const userData = yield db.collection("Users").findOne({ id: userId });
                 if (!userData) {
                     const message = "User don`t found";
+                    mgClient.close();
                     logger.debug("ScheduleController.createTask -> " + message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
@@ -74,7 +67,8 @@ export class ScheduleController {
                 const userData = yield db.collection("Users").findOne({ id: userId });
                 if (!userData) {
                     const message = "User don`t found";
-                    logger.debug("ScheduleController.create -> " + message);
+                    mgClient.close();
+                    logger.debug("ScheduleController.changeTask -> " + message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
                 const userSchedules = userData.schedules;
@@ -95,7 +89,8 @@ export class ScheduleController {
                 const userData = yield db.collection("Users").findOne({ id: userId });
                 if (!userData) {
                     const message = "User don`t found";
-                    logger.debug("ScheduleController.create -> " + message);
+                    mgClient.close();
+                    logger.debug("ScheduleController.removeTask -> " + message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
                 const userSchedules = userData.schedules;
@@ -104,7 +99,7 @@ export class ScheduleController {
                 const newColendar = colendar.getColendar();
                 yield db.collection("Users").updateOne({ _id: userData._id }, { schedules: newColendar });
                 mgClient.close();
-                logger.info("ScheduleController.changeTask -> OK");
+                logger.info("ScheduleController.removeTask -> OK");
             }));
         });
     }

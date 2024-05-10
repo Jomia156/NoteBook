@@ -16,11 +16,12 @@ import logger from "../components/logger";
 import CustomError from "../components/CustomError";
 import MailController from "../components/MailController";
 import { test } from "../components/Colendar";
+import errorHandlerController from "../errorHendlers/errorHandler.Controller";
 const mgClient = new MongoClient(AppConfig.mongoURL);
 export class UserController {
     static register(regData) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 const userData = {
                     id: generateID(),
                     login: regData.login,
@@ -56,164 +57,115 @@ export class UserController {
                     yield db.collection("Verifications").deleteOne({ _id: session.insertedId });
                 }), AppConfig.verefiSessions_lifetime);
                 MailController(regData.email, verificationSession.code);
-                logger.info("Register complete");
+                logger.debug("UserController.register -> OK");
                 return;
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
-                mgClient.close();
-            }
+            }));
         });
     }
     static login(loginData) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
                 const userData = yield db.collection("Users").findOne({ login: loginData.login });
                 if (!userData) {
-                    const message = "User don`t found1";
-                    logger.debug(message);
+                    const message = "User don`t found";
+                    mgClient.close();
+                    logger.debug("UserController.login ->" + message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
                 if (PasswordHesh.verify(loginData.password, userData.passwordHash)) {
+                    logger.debug("UserController.login -> OK");
                     return yield JWTController.create(userData.id);
                 }
                 else {
-                    const message = "User don`t found2";
-                    logger.debug(message);
+                    const message = "User don`t found";
+                    mgClient.close();
+                    logger.debug("UserController.login ->" + message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
-                mgClient.close();
-            }
+            }));
         });
     }
     static loginForRefresh(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 const payload = yield JWTController.getPayload(refreshToken);
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
                 const userData = yield db.collection("Users").findOne({ id: payload.id });
                 if (!userData) {
                     const message = "User don`t found";
-                    logger.debug(message);
+                    mgClient.close();
+                    logger.debug("UserController.loginForRefresh ->" + message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
+                logger.debug("UserController.loginForRefresh -> OK");
                 return yield JWTController.create(payload.id);
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
-                mgClient.close();
-            }
+            }));
         });
     }
     static removeUser(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
                 const userData = yield db.collection("Users").findOne({ id: userId });
                 if (!userData) {
                     const message = "User don`t found";
-                    logger.debug(message);
+                    mgClient.close();
+                    logger.debug("UserController.removeUser ->" + message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
                 yield db.collection("Users").deleteOne({ _id: userData._id });
+                logger.debug("UserController.removeUser -> OK");
                 return;
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
-                mgClient.close();
-            }
+            }));
         });
     }
     static verifiedUser(userId, verifiCode) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 mgClient.connect();
                 const db = mgClient.db("Notebook");
                 const userData = yield db.collection("Users").findOne({ id: userId });
                 if (!userData) {
                     const message = "User don`t found";
-                    logger.debug(message);
+                    mgClient.close();
+                    logger.debug("UserController.verifiedUser ->" + message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
                 const verificationSession = yield db.collection("Verifications").findOne({ userId: userId });
                 if (!verificationSession) {
                     const message = "Session don`t found";
-                    logger.debug(message);
+                    mgClient.close();
+                    logger.debug("UserController.verifiedUser ->" + message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
                 if (verificationSession.code == verifiCode) {
                     yield db.collection("Users").updateOne({ id: userId }, { verified: true });
                     yield db.collection("Verifications").deleteOne({ _id: verificationSession._id });
-                    const message = "User has been confirmed";
-                    logger.debug(message);
+                    mgClient.close();
+                    logger.debug("UserController.verifiedUser -> OK");
                     return;
                 }
                 const message = "User don`t confirmed";
-                logger.debug(message);
-                throw new CustomError("USER_DONT_CONFIRM", 422, message);
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
                 mgClient.close();
-            }
+                logger.debug("UserController.verifiedUser ->" + message);
+                throw new CustomError("USER_DONT_CONFIRM", 422, message);
+            }));
         });
     }
     static verificationReload(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 mgClient.connect();
                 const db = mgClient.db("Notebook");
                 const userData = yield db.collection("User").findOne({ id: userId });
                 if (!userData) {
                     const message = "User don`t found";
-                    logger.debug(message);
+                    mgClient.close();
+                    logger.debug("UserController.verificationReload ->" + message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
                 const verificationSession = yield db.collection("Verifications").findOne({ userId });
@@ -236,113 +188,72 @@ export class UserController {
                     }), AppConfig.verefiSessions_lifetime);
                     MailController(userData.email, verificationSession.code);
                 }
+                mgClient.close();
                 logger.info("Verification seesion has been upload");
                 return;
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
-                mgClient.close();
-            }
+            }));
         });
     }
     static changeUserData(userId, newData) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 mgClient.connect();
                 const db = mgClient.db("Notebook");
                 const userData = yield db.collection("User").findOne({ id: userId });
                 if (!userData) {
                     const message = "User don`t found";
-                    logger.debug(message);
+                    mgClient.close();
+                    logger.debug("UserController.changeUserData ->" + message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
                 let changeData = {};
                 if (newData.password) {
-                    changeData.passwordHash = passwordHash.generate(newData.password);
+                    changeData.passwordHash = PasswordHesh.generate(newData.password);
                 }
                 else {
                     changeData = Object.assign({}, newData);
                 }
                 yield db.collection("Users").updateOne({ _id: userData._id }, { changeData });
-                logger.info("User data has been update");
-                return;
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
                 mgClient.close();
-            }
+                logger.info("UserController.changeUserData -> OK");
+                return;
+            }));
         });
     }
     static getData(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 mgClient.connect();
                 const db = mgClient.db("Notebook");
                 const userData = yield db.collection("Users").findOne({ id: userId });
                 if (!userData) {
                     const message = "User don`t found";
-                    logger.debug(message);
+                    mgClient.close();
+                    logger.debug("UserController.getData ->" + message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
-                logger.info("User data has been received");
-                return userData;
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
                 mgClient.close();
-            }
+                logger.info("UserController.getData -> OK");
+                return userData;
+            }));
         });
     }
     static getList(userId, listName) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 mgClient.connect();
                 const db = mgClient.db("Notebook");
                 const userData = yield db.collection("Users").findOne({ id: userId });
                 if (!userData) {
                     const message = "User don`t found";
-                    logger.debug(message);
+                    mgClient.close();
+                    logger.debug("UserController.getList ->" + message);
                     throw new CustomError("DATA_DONT_FOUND", 404, message);
                 }
-                logger.info("List of data has been received");
-                return userData[listName];
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
                 mgClient.close();
-            }
+                logger.info("UserController.getList -> OK");
+                return userData[listName];
+            }));
         });
     }
 }

@@ -12,47 +12,36 @@ import CustomError from "../components/CustomError";
 import logger from "../components/logger";
 import { AppConfig } from "../config";
 import { generateID } from "../components/generator";
+import errorHandlerController from "../errorHendlers/errorHandler.Controller";
 const mgClient = new MongoClient(AppConfig.mongoURL);
 export class NoteController {
     static get(noteId_1, ownerId_1) {
         return __awaiter(this, arguments, void 0, function* (noteId, ownerId, collection = "Users") {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
-                const idnames = {
-                    Users: "ownerId",
-                    Schedules: "scheduleId"
-                };
                 const noteData = yield db.collection("Notes").findOne({ id: noteId });
                 if (!noteData) {
                     let message = "Note dot`t found";
-                    logger.debug(message);
+                    mgClient.close();
+                    logger.debug("NoteController.get -> " + message);
                     throw new CustomError("DATA_DONT_EXISIT", 404, message);
                 }
                 if (noteData.ownerId != ownerId) {
                     let message = "Forbidden";
-                    logger.debug(message);
+                    mgClient.close();
+                    logger.debug("NoteController.get -> " + message);
                     throw new CustomError("FORBIDDEN", 403, message);
                 }
-                return noteData;
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
                 mgClient.close();
-            }
+                logger.info("NoteController.get -> OK");
+                return noteData;
+            }));
         });
     }
     static create(ownerId, note) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 const noteData = {
                     id: generateID(),
                     ownerId: ownerId,
@@ -62,25 +51,15 @@ export class NoteController {
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
                 yield db.collection("Notes").insertOne(noteData);
-                return;
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
                 mgClient.close();
-            }
+                logger.info("NoteController.create -> OK");
+                return;
+            }));
         });
     }
     static getAll(ownerId_1) {
         return __awaiter(this, arguments, void 0, function* (ownerId, collection = "Users") {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
                 const arrayNotesId = (yield db.collection(collection).findOne({ id: ownerId })).notes;
@@ -88,84 +67,58 @@ export class NoteController {
                 if (!arrayNotes) {
                     return [];
                 }
-                return arrayNotes;
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
                 mgClient.close();
-            }
+                logger.info("NoteController.getAll -> OK");
+                return arrayNotes;
+            }));
         });
     }
     static removeById(ownerId, noteId) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
                 const note = yield db.collection("Notes").findOne({ id: noteId });
                 if (!note) {
                     let message = "Note dot`t found";
-                    logger.debug(message);
+                    mgClient.close();
+                    logger.debug("NoteController.removeById -> " + message);
                     throw new CustomError("DATA_DONT_EXISIT", 404, message);
                 }
                 if (!ownerId == note.ownerId) {
-                    logger.debug("NoteController.removeById -> FORIBBEN", 403, "There is no access");
+                    mgClient.close();
+                    logger.debug("NoteController.removeById -> FORIBBEN");
                     throw new CustomError("FORIBBEN", 403, "There is no access");
                 }
                 yield db.collection("Note").deleteOne({ _id: note._id });
-                return;
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
                 mgClient.close();
-            }
+                logger.info("NoteController.removeById -> OK");
+                return;
+            }));
         });
     }
     static changeContent(ownerId, noteId, newContent) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 yield mgClient.connect();
                 const db = mgClient.db("Notebook");
                 const noteData = yield db.collection("Notes").findOne({ id: noteId });
                 if (!noteData) {
                     let message = "Note dot`t found";
-                    logger.debug(message);
+                    mgClient.close();
+                    logger.debug("NoteController.changeContent -> " + message);
                     throw new CustomError("DATA_DONT_EXISIT", 404, message);
                 }
                 if (!ownerId == noteData.ownerId) {
-                    logger.debug("NoteController.removeById -> FORIBBEN", 403, "There is no access");
+                    mgClient.close();
+                    logger.debug("NoteController.changeContent -> FORIBBEN", 403, "There is no access");
                     throw new CustomError("FORIBBEN", 403, "There is no access");
                 }
                 yield db.collection("Notes").updateOne({ _id: noteData._id }, { content: newContent });
-                return;
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
-            finally {
                 mgClient.close();
-            }
+                logger.info("NoteController.changeContent -> OK");
+                return;
+            }));
         });
     }
 }

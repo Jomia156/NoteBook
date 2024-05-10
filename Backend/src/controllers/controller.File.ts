@@ -1,30 +1,21 @@
 import CustomError from "../components/CustomError";
 import logger from "../components/logger";
 import { AppConfig } from "../config";
-
+import errorHandlerController from "../errorHendlers/errorHandler.Controller";
 
 export class FileController {
     static async getFile(fileName: string): Promise<Buffer> {
-        try {
+        return await errorHandlerController(async ()=>{
             const file = await fetch(`http://${AppConfig.fileServerHost}:${AppConfig.fileServerPort}/files/${fileName}`)
             const arraBuffer = await file.arrayBuffer()
             const buffer = new Buffer(arraBuffer)
             logger.info("FileController.getFile -> OK")
             return buffer
-        }
-        catch (err) {
-            if (err instanceof CustomError) {
-                throw err
-            }
-            else {
-                logger.error(err)
-                throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера")
-            }
-        }
+        })
     }
 
     static async uploadFile(file: Buffer, filename:string): Promise<string> {
-        try {
+        return await errorHandlerController(async ()=>{
             let formData = new FormData()
             formData.append("firstName", "John");
             formData.append("filedata", new Blob([file]), filename);
@@ -38,16 +29,7 @@ export class FileController {
             }).then(data=>data.json()).then(data=>data.data)
             logger.info("FileController.uploadFile -> OK")
             return fileName;
-        }
-        catch (err) {
-            if (err instanceof CustomError) {
-                throw err
-            }
-            else {
-                logger.error(err)
-                throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера")
-            }
-        }
+        })
     }
 
 }

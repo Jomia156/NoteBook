@@ -7,33 +7,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import CustomError from "../components/CustomError";
 import logger from "../components/logger";
 import { AppConfig } from "../config";
+import errorHandlerController from "../errorHendlers/errorHandler.Controller";
 export class FileController {
     static getFile(fileName) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 const file = yield fetch(`http://${AppConfig.fileServerHost}:${AppConfig.fileServerPort}/files/${fileName}`);
                 const arraBuffer = yield file.arrayBuffer();
                 const buffer = new Buffer(arraBuffer);
                 logger.info("FileController.getFile -> OK");
                 return buffer;
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
+            }));
         });
     }
     static uploadFile(file, filename) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
+            return yield errorHandlerController(() => __awaiter(this, void 0, void 0, function* () {
                 let formData = new FormData();
                 formData.append("firstName", "John");
                 formData.append("filedata", new Blob([file]), filename);
@@ -46,16 +37,7 @@ export class FileController {
                 }).then(data => data.json()).then(data => data.data);
                 logger.info("FileController.uploadFile -> OK");
                 return fileName;
-            }
-            catch (err) {
-                if (err instanceof CustomError) {
-                    throw err;
-                }
-                else {
-                    logger.error(err);
-                    throw new CustomError("UNEXPECTION_ERROR", 500, "Неожидання ошибка сервера");
-                }
-            }
+            }));
         });
     }
 }

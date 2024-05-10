@@ -43,11 +43,13 @@ export class EventController {
                 const db = mgClient.db("Notebook");
                 const eventData = yield db.collection("Events").findOne({ id: eventId });
                 if (!eventData) {
+                    mgClient.close();
                     logger.debug("EventController.remove -> Event don`t found");
                     throw new CustomError("DATA_DONT_FOUND", 404, "Event don`t found");
                 }
                 if (eventData.ownerId != ownerId) {
                     let message = "Forbidden";
+                    mgClient.close();
                     logger.debug(message);
                     throw new CustomError("FORBIDDEN", 403, message);
                 }
@@ -64,11 +66,13 @@ export class EventController {
                 const db = mgClient.db("Notebook");
                 const eventData = yield db.collection("Events").findOne({ id: eventId });
                 if (!eventData) {
+                    mgClient.close();
                     logger.debug("EventController.chamgeData -> Event don`t found");
                     throw new CustomError("DATA_DONT_FOUND", 404, "Event don`t found");
                 }
                 if (eventData.ownerId != ownerId) {
                     let message = "Forbidden";
+                    mgClient.close();
                     logger.debug(message);
                     throw new CustomError("FORBIDDEN", 403, message);
                 }
@@ -85,10 +89,12 @@ export class EventController {
                 const db = mgClient.db("Notebook");
                 const eventData = yield db.collection("Events").findOne({ id: eventId });
                 if (!eventData) {
+                    mgClient.close();
                     logger.debug("EventController.getData -> Event don`t found");
                     throw new CustomError("DATA_DONT_FOUND", 404, "Event don`t found");
                 }
                 if (!ownerId == eventData.ownerId) {
+                    mgClient.close();
                     logger.debug("NoteController.removeById -> FORIBBEN", 403, "There is no access");
                     throw new CustomError("FORIBBEN", 403, "There is no access");
                 }
@@ -105,11 +111,13 @@ export class EventController {
                 const db = mgClient.db("Notebook");
                 const eventData = yield db.collection("Events").findOne({ id: eventId });
                 if (!eventData) {
+                    mgClient.close();
                     logger.debug("EventController.getList -> Event don`t found");
                     throw new CustomError("DATA_DONT_FOUND", 404, "Event don`t found");
                 }
                 if (eventData.ownerId != ownerId) {
                     let message = "Forbidden";
+                    mgClient.close();
                     logger.debug(message);
                     throw new CustomError("FORBIDDEN", 403, message);
                 }
