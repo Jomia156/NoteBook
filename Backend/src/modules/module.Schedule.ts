@@ -1,6 +1,6 @@
 import errorHandlerModule from "../errorHendlers/errorHandler.Module";
 import logger from "../components/logger";
-import { ScheduleController } from "../controllers/controller.schedule";
+import { ScheduleController } from "../controllers/controller.Schedule";
 import { TDateScritg, TFastifyRequerst, TSchuduleData, TTask } from "../types";
 import { FastifyReply } from "fastify";
 

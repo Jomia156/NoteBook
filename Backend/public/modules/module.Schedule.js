@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import errorHandlerModule from "../errorHendlers/errorHandler.Module";
 import logger from "../components/logger";
-import { ScheduleController } from "../controllers/controller.schedule";
+import { ScheduleController } from "../controllers/controller.Schedule";
 export default class ScheduleModule {
     static get(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
