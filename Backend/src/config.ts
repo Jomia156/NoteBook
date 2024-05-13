@@ -8,7 +8,7 @@ export const AppConfig = {
     IMAPPort:2525,
     mail_user:"time.meneger@ro.ru",
     mail_password:"devPassword156",
-    accessToken_lifetime:"10m",
+    accessToken_lifetime:"1h",
     refreshToken_lifeTime:"15d",
     verefiSessions_lifetime:1000*60*10, //10 минут
     fileServerHost:"localhost",

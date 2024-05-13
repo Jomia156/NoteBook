@@ -123,7 +123,7 @@ Request:
 }
 ```
 
-#### Get user data
+#### Remove user
 > Path: */api/user*
 
 > Method: *DELETE*

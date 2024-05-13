@@ -5,7 +5,7 @@ import { authorization } from "../middlewares/middleware.authorization";
 export default function (app: FastifyInstance) {
     app.route({
         method: 'GET',
-        url: '/api/file/:fileName',
+        url: '/api/file/:filename',
         handler: ModuleFile.getFile
     })
 

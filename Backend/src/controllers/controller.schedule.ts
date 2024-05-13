@@ -18,19 +18,19 @@ export class ScheduleController {
             const db = mgClient.db("Notebook")
 
             if (date) {
-                const schedules = await db.collection("Users").findOne({ id: userId, schedules: }, { schedules: 1 })
+                const schedules = await db.collection("Users").findOne({ id: userId }, { schedules: 1 })
                 const colendar = new Colendar(schedules)
                 colendar.getColendarFromMonth(date)
 
-                mgClient.close()
+                
                 logger.info("ScheduleController.get -> OK")
 
                 return colendar.getColendar()
             }
             else {
-                const schedules = await db.collection("Users").findOne({ id: userId, schedules: }, { schedules: 1 })
+                const schedules = await db.collection("Users").findOne({ id: userId }, { schedules: 1 })
 
-                mgClient.close()
+                
                 logger.info("ScheduleController.get -> OK")
                 return schedules
             }
@@ -45,7 +45,7 @@ export class ScheduleController {
             const userData = await db.collection("Users").findOne({ id: userId })
             if (!userData) {
                 const message = "User don`t found"
-                mgClient.close()
+                
                 logger.debug("ScheduleController.createTask -> " + message)
                 throw new CustomError("DATA_DONT_FOUND", 404, message)
             }
@@ -55,10 +55,10 @@ export class ScheduleController {
             colendar.appendTask(scheduleData.date, scheduleData.task)
             const newColendar = colendar.getColendar()
 
-            await db.collection("Users").updateOne({ _id: userData._id }, { schedules: newColendar })
+            await db.collection("Users").updateOne({ _id: userData._id }, { $set: {schedules: newColendar} })
 
 
-            mgClient.close()
+            
             logger.info("ScheduleController.createTask -> OK")
         })
     }
@@ -71,7 +71,7 @@ export class ScheduleController {
             const userData = await db.collection("Users").findOne({ id: userId })
             if (!userData) {
                 const message = "User don`t found"
-                mgClient.close()
+                
                 logger.debug("ScheduleController.changeTask -> " + message)
                 throw new CustomError("DATA_DONT_FOUND", 404, message)
             }
@@ -81,9 +81,9 @@ export class ScheduleController {
             colendar.uploadTask(newTask.date, newTask)
             const newColendar = colendar.getColendar()
 
-            await db.collection("Users").updateOne({ _id: userData._id }, { schedules: newColendar })
+            await db.collection("Users").updateOne({ _id: userData._id }, { $set: {schedules: newColendar} })
 
-            mgClient.close()
+            
             logger.info("ScheduleController.changeTask -> OK")
         })
     }
@@ -96,7 +96,7 @@ export class ScheduleController {
             const userData = await db.collection("Users").findOne({ id: userId })
             if (!userData) {
                 const message = "User don`t found"
-                mgClient.close()
+                
                 logger.debug("ScheduleController.removeTask -> " + message)
                 throw new CustomError("DATA_DONT_FOUND", 404, message)
             }
@@ -106,9 +106,9 @@ export class ScheduleController {
             colendar.removeTask(date, taskId)
             const newColendar = colendar.getColendar()
 
-            await db.collection("Users").updateOne({ _id: userData._id }, { schedules: newColendar })
+            await db.collection("Users").updateOne({ _id: userData._id }, { $set: {schedules: newColendar} })
 
-            mgClient.close()
+            
             logger.info("ScheduleController.removeTask -> OK")
         })
     }

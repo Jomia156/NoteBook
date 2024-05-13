@@ -18,6 +18,16 @@ export class UserModule {
 
     static async register(request: TFastifyRequerst<TRegistarData>, response: FastifyReply) {
         await errorHandlerModule(response, async () => {
+            const emailRegExp = new RegExp(".*@.*[.][a-z]*")
+            if (!emailRegExp.test(request.body.email)) {
+                response.send({
+                    "statusCode": 400,
+                    "code": "FST_ERR_VALIDATION",
+                    "error": "Bad Request",
+                    "message": "body must have required property 'email'"
+                })
+                return
+            }
             await UserController.register(request.body)
             response.send({
                 statusCode: 201
@@ -47,7 +57,7 @@ export class UserModule {
 
     static async verifiedUser(request: TFastifyRequerst<TVerificationRequest>, response: FastifyReply) {
         await errorHandlerModule(response, async () => {
-            await UserController.verifiedUser(request.userData.id, request.body.verificationCode)
+            await UserController.verifiedUser(request.userData.id, request.query.verificationCode)
             response.send({
                 statusCode: 201
             }).status(201)
@@ -75,9 +85,16 @@ export class UserModule {
     static async getUserData(request: TFastifyRequerst<undefined>, response: FastifyReply) {
         await errorHandlerModule(response, async () => {
             const userData = await UserController.getData(request.userData.id)
+            const formatUserData = {
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+                avatar: userData.avatar,
+                verified: userData.verified
+            }
             response.send({
                 statusCode: 200,
-                data: userData
+                data: formatUserData
             }).status(200)
         })
     }
@@ -97,6 +114,9 @@ export class UserModule {
                     statusCode: 200,
                     data: list
                 }).status(200)
+            }
+            else {
+                throw new CustomError("DATA_DONT_FOUND", 404, "Collection don`t found")
             }
         })
     }

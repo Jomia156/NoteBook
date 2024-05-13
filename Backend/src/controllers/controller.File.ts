@@ -12,7 +12,7 @@ export class FileController {
             logger.info("FileController.getFile -> OK")
             return buffer
         })
-    }
+    } 
 
     static async uploadFile(file: Buffer, filename:string): Promise<string> {
         return await errorHandlerController(async ()=>{

@@ -41,7 +41,7 @@ export default function (app: FastifyInstance) {
                         type: "string"
                     },
                     email: {
-                        type: "string"
+                        type: "string",
                     }
                 }
             }
@@ -195,6 +195,6 @@ export default function (app: FastifyInstance) {
             },
         },
         preHandler: authorization,
-        handler: UserModule.getUserData
+        handler: UserModule.getList
     })
 }

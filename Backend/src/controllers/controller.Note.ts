@@ -18,17 +18,17 @@ export class NoteController {
             const noteData = await db.collection("Notes").findOne({ id: noteId })
             if (!noteData) {
                 let message = "Note dot`t found"
-                mgClient.close()
+
                 logger.debug("NoteController.get -> " + message)
                 throw new CustomError("DATA_DONT_EXISIT", 404, message)
             }
             if (noteData.ownerId != ownerId) {
                 let message = "Forbidden"
-                mgClient.close()
+
                 logger.debug("NoteController.get -> " + message)
                 throw new CustomError("FORBIDDEN", 403, message)
             }
-            mgClient.close()
+
             logger.info("NoteController.get -> OK")
             return noteData
         })
@@ -47,7 +47,7 @@ export class NoteController {
             const db = mgClient.db("Notebook")
 
             await db.collection("Notes").insertOne(noteData)
-            mgClient.close()
+
             logger.info("NoteController.create -> OK")
             return
         })
@@ -63,7 +63,7 @@ export class NoteController {
             if (!arrayNotes) {
                 return []
             }
-            mgClient.close()
+
             logger.info("NoteController.getAll -> OK")
             return arrayNotes
         })
@@ -77,17 +77,17 @@ export class NoteController {
             const note = await db.collection("Notes").findOne({ id: noteId })
             if (!note) {
                 let message = "Note dot`t found"
-                mgClient.close()
+
                 logger.debug("NoteController.removeById -> " + message)
                 throw new CustomError("DATA_DONT_EXISIT", 404, message)
             }
             if (!ownerId == note.ownerId) {
-                mgClient.close()
+
                 logger.debug("NoteController.removeById -> FORIBBEN")
                 throw new CustomError("FORIBBEN", 403, "There is no access")
             }
             await db.collection("Note").deleteOne({ _id: note._id })
-            mgClient.close()
+
             logger.info("NoteController.removeById -> OK")
             return
         })
@@ -101,17 +101,17 @@ export class NoteController {
             const noteData = await db.collection("Notes").findOne({ id: noteId })
             if (!noteData) {
                 let message = "Note dot`t found"
-                mgClient.close()
+
                 logger.debug("NoteController.changeContent -> " + message)
                 throw new CustomError("DATA_DONT_EXISIT", 404, message)
             }
             if (!ownerId == noteData.ownerId) {
-                mgClient.close()
+
                 logger.debug("NoteController.changeContent -> FORIBBEN", 403, "There is no access")
                 throw new CustomError("FORIBBEN", 403, "There is no access")
             }
-            await db.collection("Notes").updateOne({ _id: noteData._id }, { content: newContent })
-            mgClient.close()
+            await db.collection("Notes").updateOne({ _id: noteData._id }, { $set: { content: newContent } })
+
             logger.info("NoteController.changeContent -> OK")
             return
         })

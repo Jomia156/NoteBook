@@ -66,7 +66,7 @@ export class UserController {
             const userData = await db.collection("Users").findOne({ login: loginData.login })
             if (!userData) {
                 const message = "User don`t found"
-                mgClient.close()
+                
                 logger.debug("UserController.login ->"+message)
                 throw new CustomError("DATA_DONT_FOUND", 404, message)
             }
@@ -76,7 +76,7 @@ export class UserController {
             }
             else {
                 const message = "User don`t found"
-                mgClient.close()
+                
                 logger.debug("UserController.login ->"+message)
                 throw new CustomError("DATA_DONT_FOUND", 404, message)
             }
@@ -87,12 +87,18 @@ export class UserController {
         return await errorHandlerController(async () => {
             const payload = await JWTController.getPayload(refreshToken)
 
+            if (payload.type != "refresh") {
+                const message = "Token don`t have type refresh"
+                logger.debug(message)
+                throw new CustomError("TOKEN_DONT_VALID", 403, message)
+            }
+
             await mgClient.connect()
             const db = mgClient.db("Notebook")
             const userData = await db.collection("Users").findOne({ id: payload.id })
             if (!userData) {
                 const message = "User don`t found"
-                mgClient.close()
+                
                 logger.debug("UserController.loginForRefresh ->"+message)
                 throw new CustomError("DATA_DONT_FOUND", 404, message)
             }
@@ -110,7 +116,7 @@ export class UserController {
 
             if (!userData) {
                 const message = "User don`t found"
-                mgClient.close()
+                
                 logger.debug("UserController.removeUser ->"+message)
                 throw new CustomError("DATA_DONT_FOUND", 404, message)
             }
@@ -129,28 +135,28 @@ export class UserController {
             const userData = await db.collection("Users").findOne({ id: userId })
             if (!userData) {
                 const message = "User don`t found"
-                mgClient.close()
+                
                 logger.debug("UserController.verifiedUser ->"+message)
                 throw new CustomError("DATA_DONT_FOUND", 404, message)
             }
             const verificationSession = await db.collection("Verifications").findOne({ userId: userId })
             if (!verificationSession) {
                 const message = "Session don`t found"
-                mgClient.close()
+                
                 logger.debug("UserController.verifiedUser ->"+message)
                 throw new CustomError("DATA_DONT_FOUND", 404, message)
             }
 
             if (verificationSession.code == verifiCode) {
-                await db.collection("Users").updateOne({ id: userId }, { verified: true })
+                await db.collection("Users").updateOne({ id: userId }, { $set: {verified: true} })
                 await db.collection("Verifications").deleteOne({ _id: verificationSession._id })
 
-                mgClient.close()
+                
                 logger.debug("UserController.verifiedUser -> OK")
                 return
             }
             const message = "User don`t confirmed"
-            mgClient.close()
+            
             logger.debug("UserController.verifiedUser ->"+message)
             throw new CustomError("USER_DONT_CONFIRM", 422, message)
         })
@@ -161,18 +167,18 @@ export class UserController {
             mgClient.connect()
             const db = mgClient.db("Notebook")
 
-            const userData = await db.collection("User").findOne({ id: userId })
+            const userData = await db.collection("Users").findOne({ id: userId })
             if (!userData) {
                 const message = "User don`t found"
-                mgClient.close()
                 logger.debug("UserController.verificationReload ->"+message)
                 throw new CustomError("DATA_DONT_FOUND", 404, message)
             }
 
-            const verificationSession = await db.collection("Verifications").findOne({ userId })
+            const verificationSession = await db.collection("Verifications").findOne({ userId:userId })
             const newVerifiCode = generateVerifiCode()
             if (verificationSession) {
-                await db.collection("Verifications").updateOne({ userId }, { code: newVerifiCode })
+                await db.collection("Verifications").updateOne({ userId }, { $set: {code: newVerifiCode } })
+                MailController(userData.email, newVerifiCode)
             }
             else {
                 const verificationSession = {
@@ -188,9 +194,9 @@ export class UserController {
                     await db.collection("Verifications").deleteOne({ _id: session.insertedId })
                 }, AppConfig.verefiSessions_lifetime)
 
-                MailController(userData.email, verificationSession.code)
+                MailController(userData.email, newVerifiCode)
             }
-            mgClient.close()
+            
             logger.info("Verification seesion has been upload")
             return
         })
@@ -201,10 +207,9 @@ export class UserController {
             mgClient.connect()
             const db = mgClient.db("Notebook")
 
-            const userData = await db.collection("User").findOne({ id: userId })
+            const userData = await db.collection("Users").findOne({ id: userId })
             if (!userData) {
                 const message = "User don`t found"
-                mgClient.close()
                 logger.debug("UserController.changeUserData ->"+message)
                 throw new CustomError("DATA_DONT_FOUND", 404, message)
             }
@@ -215,9 +220,9 @@ export class UserController {
             else {
                 changeData = { ...newData }
             }
-            await db.collection("Users").updateOne({ _id: userData._id }, { changeData })
+            await db.collection("Users").updateOne({ _id: userData._id }, { $set: {...changeData} })
             
-            mgClient.close()
+            
             logger.info("UserController.changeUserData -> OK")
             return
         })
@@ -231,12 +236,12 @@ export class UserController {
             const userData = await db.collection("Users").findOne({ id: userId })
             if (!userData) {
                 const message = "User don`t found"
-                mgClient.close()
+                
                 logger.debug("UserController.getData ->"+message)
                 throw new CustomError("DATA_DONT_FOUND", 404, message)
             }
 
-            mgClient.close()
+            
             logger.info("UserController.getData -> OK")
             return userData
         })
@@ -250,12 +255,12 @@ export class UserController {
             const userData = await db.collection("Users").findOne({ id: userId })
             if (!userData) {
                 const message = "User don`t found"
-                mgClient.close()
+                
                 logger.debug("UserController.getList ->"+message)
                 throw new CustomError("DATA_DONT_FOUND", 404, message)
             }
 
-            mgClient.close()
+            
             logger.info("UserController.getList -> OK")
             return userData[listName]
         })
