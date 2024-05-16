@@ -1,0 +1,16 @@
+{
+    "name": "frontend",
+    "version": "1.0.0",
+    "description": "Frontend server for NoteBook application for diplom",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "dev": "nodemon"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.19.2"
+    }
+}
