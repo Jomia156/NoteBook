@@ -20,12 +20,10 @@ export class ScheduleController {
             if (date) {
                 const schedules = await db.collection("Users").findOne({ id: userId }, { schedules: 1 })
                 const colendar = new Colendar(schedules)
-                colendar.getColendarFromMonth(date)
-
                 
                 logger.info("ScheduleController.get -> OK")
 
-                return colendar.getColendar()
+                return colendar.getColendarFromMonth(date)
             }
             else {
                 const schedules = await db.collection("Users").findOne({ id: userId }, { schedules: 1 })

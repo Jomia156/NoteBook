@@ -201,7 +201,7 @@ Request:
 }
 ```
 #### Update user data
-> Path: */api/user/verificationReload*
+> Path: */api/user*
 
 > Method: *PUT*
 
@@ -234,7 +234,7 @@ Request:
 #### Get list collection for user (events, notes)
 > Path: */api/user/list/:listType*
 
-> Method: *PUT*
+> Method: *GET*
 
 Headers: 
 
@@ -321,7 +321,7 @@ Request:
     desctiptinon: sting,
     code:string,
     data: {
-            _id: ObjectId;
+        _id: ObjectId;
         id: string;
         userId: string;
         title: string;
@@ -397,7 +397,7 @@ Request:
 
 ### Update events for user
 
-> Path: */api/event*
+> Path: */api/event/:eventId*
 
 > Method: *PUT*
 
@@ -636,7 +636,7 @@ Request:
     }
 }
 ```
-#### Get all notes for user
+#### Remove note for user
 > Path: */api/user/notes/:noteId*
 
 > Method: *DELETE*
@@ -656,7 +656,7 @@ Request:
     code:string
 }
 ```
-#### Get all notes for event
+#### Remove note for event
 > Path: */api/event/:eventId:/notes/:noteId*
 
 > Method: *DELETE*
