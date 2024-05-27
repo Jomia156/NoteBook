@@ -1,0 +1,135 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-weight: 300;
+    min-height: 300vh;
+
+    .pod {
+        display: flex;
+        height: auto;
+        width: auto;
+    }
+
+    span {
+        color: #FF4C7C;
+    }
+
+    .container {
+        width: 90vw;
+        margin: 0 auto;
+    }
+
+    header {
+        margin: 0;
+        background-image: url(../imgs/headerBackground.png);
+        background-size: 100%;
+        background-repeat: repeat;
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 0vw;
+            padding-top: 2vw;
+            padding-left: 1.5vw;
+            padding-right: 1.5vw;
+
+            h1 {
+                display: inline-table;
+                margin: 0;
+                padding: 0;
+                color: #fff;
+                font-size: 2vw;
+                font-weight: normal
+            }
+
+            .map {
+                margin-right: 2vw;
+                display: inline-table;
+                height: auto;
+
+                a {
+                    color: #fff;
+                    font-size: 1.5vw;
+                    text-decoration: none;
+                    margin-left: 1vw;
+                }
+            }
+
+            .authlogin {
+                height: auto;
+                display: inline-table;
+
+                a {
+                    background-color: #FF4C7C;
+                    padding: 0.5vw 1.5vw;
+                    border-radius: 0.2vw;
+                    margin-left: 1vw;
+                    font-size: 1.3vw;
+                    color: #fff;
+                    text-decoration: none;
+                }
+            }
+        }
+
+        .info {
+            text-align: center;
+            padding-top: 15vw;
+            padding-bottom: 15vw;
+            color: #fff;
+
+            h1 {
+                font-size: 4vw;
+                font-weight: normal;
+                margin: 0;
+                margin-bottom: 1vw;
+
+                span {
+                    border-bottom: 0.2vw solid #FF4C7C;
+                }
+            }
+
+            h2 {
+                margin: 0 auto;
+                width: 50%;
+                font-size: 1.5vw;
+                font-weight: normal;
+                font-weight: 200;
+            }
+        }
+    }
+
+
+    .about {
+        display: flex;
+        flex-wrap: wrap;
+
+        h1 {
+            width: 100%;
+            font-size: 3.5vw;
+            font-weight: 300;
+            margin-top: 5vw;
+            margin-bottom: 0;
+        }
+
+        padding-bottom: 5%;
+
+        background-image: url(../imgs/aboutBackgrond.png);
+        background-repeat: no-repeat;
+        background-position:right;
+        background-size: 40%;
+
+        .info {
+            width: 60%;
+
+            p {
+                text-indent: 1.5vw;
+                font-size: 1.5vw;
+            }
+        }
+
+    }
+}
